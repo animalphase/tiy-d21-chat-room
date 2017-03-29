@@ -11,7 +11,7 @@ export default function ViewLogin(username) {
     //create elements:
     this.$sectionLogin = $('section.login');
     this.$formLogin = $('<form id="form-login">');
-    this.$inputUsername = $('<input id="input-username" placeholder="username">');
+    this.$inputUsername = $('<input id="input-username" placeholder="username" value="bitey">');
     this.$btnLogin = $('<button id="btn-login">login</button>');
 
     //assemble into dom:

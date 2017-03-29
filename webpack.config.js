@@ -60,7 +60,10 @@ var config = {
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery'
-    })
+    }),
+    new webpack.ProvidePlugin({
+     moment: 'moment'
+   })
   ]
 
 };

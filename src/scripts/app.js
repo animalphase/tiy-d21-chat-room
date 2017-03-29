@@ -4,7 +4,8 @@
 collection url: http://tiny-za-server.herokuapp.com/collections/ce-moonicorn-chat/
 */
 
-const g_store = {
+
+const store = {
   targetFunctions: [],
 
   add: function (newtargetFunction) {
@@ -18,11 +19,12 @@ const g_store = {
   }
 };
 
-const g_rootURL = 'http://tiny-za-server.herokuapp.com/collections/ce-moonicorn-chat/';
-const g_getMessagesSettings = {
+
+const rootURL = 'http://tiny-za-server.herokuapp.com/collections/ce-moonicorn-chat/';
+const getMessagesSettings = {
   type: 'GET',
   dataType: 'json',
-  url: g_rootURL
+  url: rootURL
 };
 
 
@@ -34,7 +36,7 @@ import ViewLogin from "./view-login.js";
 import ViewChat from "./view-chat.js";
 
 
-console.log(g_store);
+console.log(store);
 console.log(session);
 
 
@@ -47,8 +49,10 @@ export default function app() {
 
 		// let chatView = new ViewChat();
 		// chatView.renderMessages();
+		// var moment = require('moment');
+		// moment().format();
 	});
-	// end document ready fucntion
+	// end document ready function
 
 }
 
@@ -57,18 +61,24 @@ export default function app() {
 
 
 
-const g_getMessages = () => {
-  $.ajax(g_getMessagesSettings).then(doStuffWithMessages);
-	
+const getMessages = () => {
+  $.ajax(getMessagesSettings).then( (data, status, xhr) => {
+		let $messagesContainer = $('.messages');
+		$messagesContainer.html('');
+		data.forEach( (message, i, array) => {
+			console.log(message);
+			let $messageDiv = $('<div class="message">');
+			$messageDiv
+				.append(`<div class="timestamp">${message.timestamp}</div>`)
+				.append(`<div class="author">${message.author}</div>`)
+				.append(`<div class="body">${message.body}</div>`);
+			$messagesContainer.append($messageDiv);
+		});
+	});
 };
-g_getMessages();
+getMessages();
 
 
-const doStuffWithMessages = (data, status, xhr) => {
-	$messagesContainer = $('.messages');
-	$messagesContainer.html('');
-	console.log(data);
-};
 
 
 const postMessage = (newMessage) => {
@@ -76,10 +86,10 @@ const postMessage = (newMessage) => {
   let postSettings = {
     type: 'POST',
     contentType: 'application/json',
-    url: g_rootURL,
+    url: rootURL,
     data: JSON.stringify(newMessage)
   };
-  $.ajax(postSettings);
+  $.ajax(postSettings).then(getMessages);
 	console.log('posted message:', newMessage);
   return false;
 };
@@ -87,7 +97,7 @@ const postMessage = (newMessage) => {
 
 const deleteMessage = (item) => {
   let id = item._id;
-  let itemURL = g_rootURL + id;
+  let itemURL = rootURL + id;
   let deleteSettings = {
     type: 'DELETE',
     url: itemURL
@@ -97,7 +107,7 @@ const deleteMessage = (item) => {
 
 
 const clearAllMessages = () => {
-  $.ajax(g_getMessagesSettings).then(function(data, status, xhr){
+  $.ajax(getMessagesSettings).then(function(data, status, xhr){
     data.forEach(function(item){
 			console.log(item);
       deleteMessage(item);
@@ -108,7 +118,7 @@ const clearAllMessages = () => {
 
 const authorMessage = () => {
 
-	if('clicked_postmessage'){
+	if('clicked_post_message'){
 
 		let inputText = $inputPost.val();
 
@@ -119,10 +129,11 @@ const authorMessage = () => {
 
 		let newMessageBody = $inputPost.val();
 		$inputPost.val('');
-
+		let currentdate = new Date();
 		let newMessage = {
 			body: newMessageBody,
-			author: session.name
+			author: session.name,
+			timestamp: currentdate.getHours() + ':' + currentdate.getMinutes()
 		};
 
 		console.log('assembled message:', newMessage);
@@ -131,7 +142,7 @@ const authorMessage = () => {
 };
 
 
-g_store.add(authorMessage);
+store.add(authorMessage);
 
 
 let $formPostMessage = $('#form-post-message');
@@ -141,5 +152,5 @@ let $bntPost = $('#btn-post');
 
 $bntPost.on('click', (e) => {
 	e.preventDefault();
-	g_store.fire('clicked_postmessage');
+	store.fire('clicked_post_message');
 });
